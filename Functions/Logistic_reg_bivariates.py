@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
-
+from xgboost import XGBClassifier
 # Load your dataset (replace 'your_data.csv' with the path to your dataset)
 src = r'C:\Users\ParnikaPancholi\PycharmProjects\Ob_no_Auth\Data\Input'
 indsn = 'Ob_Noic_23_v2'
@@ -20,19 +20,24 @@ hl= 'Ob_Noic_23_v2_hl'
 data = pd.read_pickle(r"{}\{}.pkl".format(str(src), str(indsn)))
 hold_out = pd.read_pickle(r"{}\{}.pkl".format(str(src), str(hl)))
 drop_columns = ['mem_id_no_client', 'patient_id', 'onboard_date', 'target_date', 'events']
+data['progyny_rx'] = data['progyny_rx'].astype('int64')
+data['type_of_fully_insured_plan'] = data['type_of_fully_insured_plan'].astype('int64')
+data['rx_embedded_moop'] = data['rx_embedded_moop'].astype('int64')
+data['email_refused'] = data['email_refused'].astype('int64')
 # Define your features (X) and target (y)
 X = data.drop(drop_columns, axis=1)  # Adjust 'target_column' to the name of your target column
+X['rx_embedded_deductible'] = X['rx_embedded_deductible'].astype('int64')
 y = data['events']
 X_hl =hold_out.drop(drop_columns, axis=1)
 y_hl =hold_out['events']
-hold_out.shape()
+
 # Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=42)
 
 # Create a Logistic Regression model
 # Create a Decision Tree model
 model = DecisionTreeClassifier()
-
+model = XGBClassifier()
 # Train the model on the training data
 model.fit(X_train, y_train)
 
@@ -47,7 +52,6 @@ classification_rep = classification_report(y_test, y_pred)
 
 print("Accuracy:", accuracy)
 print("Classification Report:\n", classification_rep)
-
 accuracy = accuracy_score(y_hl, y_hl_pred)
 classification_rep = classification_report(y_hl, y_hl_pred)
 
