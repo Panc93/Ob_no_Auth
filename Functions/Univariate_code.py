@@ -5,19 +5,26 @@ Created on Mon Oct  2 18:12:14 2023
 @author: ParnikaPancholi
 """
 
-def univar_exec(src="",wrk="", oup="", tnp="", indsn="", Train_start_dt="", Train_end_dt ="", minmisslmt="",l1misslmt="",l2misslmt="" , maxmisslmt=75):
+
+def univar_exec(src="", wrk="", oup="", tnp="", indsn="", Train_start_dt="", Train_end_dt="", minmisslmt="",
+                l1misslmt="", l2misslmt="", maxmisslmt=75):
     """
+    :param wrk:
+    :param l2misslmt:
+    :param maxmisslmt:
+    :param minmisslmt:
+    :param l1misslmt:
     :param src: Path to input folder
     :param oup: Path to Output folder
     :param tnp: Path to Temporary folder
     :param indsn: Name of the Input Data frame
-    :param timelwlmt: Specify Min Date (based on Training Data)
-    :param timeuplmt: Specify Max Date (based on Training Data)
+    :param Train_start_dt: Specify Min Date (based on Training Data)
+    :param Train_end_dt: Specify Max Date (based on Training Data)
     :return: Univariate Analysis of all variables in Data Dictionary indicating missing percentages,value_counts etc.
     """
-
     # Check if all the input parameters are properly specified
-    if (src == "" or oup == "" or  tnp == "" or indsn == "" or Train_start_dt == "" or Train_end_dt == "" or maxmisslmt == "" or  minmisslmt=="" or l1misslmt=="" or l2misslmt=="") :
+    if (
+            src == "" or wrk == "" or oup == "" or tnp == "" or indsn == "" or Train_start_dt == "" or Train_end_dt == "" or maxmisslmt == "" or minmisslmt == "" or l1misslmt == "" or l2misslmt == ""):
         print("INPUT PARAMETERS ARE NOT SPECIFIED PROPERLY IN FUNCTION CALL!")
         return False
 
@@ -27,22 +34,22 @@ def univar_exec(src="",wrk="", oup="", tnp="", indsn="", Train_start_dt="", Trai
     sys.path.insert(1, r'..\.')
     from datetime import date
     ###from Libraries.check_path import check_path
-    #print("CHECK: IF SPECIFIED PATHS ARE VALID")
-    #check1 = check_path(src, oup, tnp)
-    #if check1:
-     #   try:
-            # import data dictionary for base variables
+    # print("CHECK: IF SPECIFIED PATHS ARE VALID")
+    # check1 = check_path(src, oup, tnp)
+    # if check1:
+    #   try:
+    # import data dictionary for base variables
     col_dtls = pd.read_excel(r"{}\{}_clmn_dtls.xlsx".format(str(src), str(indsn[:10])))
-            # read input pickle file
+    # read input pickle file
     input_df = pd.read_pickle(r"{}\{}.pkl".format(str(src), str(indsn)))
-         #   print(r"{} and {}_clmn_dtls successfully read.".format(str(indsn), str(indsn)))
-        #    print("---------------------------------------------------")
-       #     print("")
-      #  except:
-     #       print(r"Unable to read {} or {}_clmn_dtls Dataframe!".format(str(indsn), str(indsn)))
+    #   print(r"{} and {}_clmn_dtls successfully read.".format(str(indsn), str(indsn)))
+    #    print("---------------------------------------------------")
+    #     print("")
+    #  except:
+    #       print(r"Unable to read {} or {}_clmn_dtls Dataframe!".format(str(indsn), str(indsn)))
     #        return False
-   # else:
-  #      return False
+    # else:
+    #      return False
 
     # UNIVARIATE CODE STARTS FROM HERE
     col_dtls['VAR_NAME'] = col_dtls['VAR_NAME'].str.lower()
@@ -59,8 +66,8 @@ def univar_exec(src="",wrk="", oup="", tnp="", indsn="", Train_start_dt="", Trai
     # Convert the str objects to datetime.date objects
     Train_start_dt = date.fromisoformat(Train_start_dt)
     Train_end_dt = date.fromisoformat(Train_end_dt)
-    input_df_train = input_df[(input_df['target_date'] >= Train_start_dt ) & (input_df['target_date'] <=  Train_end_dt )]
-    input_df_hold = input_df[input_df['target_date'] >  Train_end_dt ]
+    input_df_train = input_df[(input_df['target_date'] >= Train_start_dt) & (input_df['target_date'] <= Train_end_dt)]
+    input_df_hold = input_df[input_df['target_date'] > Train_end_dt]
 
     # Resetting index
     input_df.reset_index(drop=True, inplace=True)
@@ -80,7 +87,8 @@ def univar_exec(src="",wrk="", oup="", tnp="", indsn="", Train_start_dt="", Trai
         print(len(input_df_uni_miss.VAR_NAME))
         print("")
     else:
-        print("NO OF COLUMNS IN INPUT DATAFRAME AND MISSING COLUMN DATAFRAME DOES NOT MATCH. CHECK DATA DICT DATAFRAME!")
+        print(
+            "NO OF COLUMNS IN INPUT DATAFRAME AND MISSING COLUMN DATAFRAME DOES NOT MATCH. CHECK DATA DICT DATAFRAME!")
         return False
 
     print("TOTAL LIST OF VARIABLES WITH UNIVARIATE ANALYSIS")
@@ -97,8 +105,8 @@ def univar_exec(src="",wrk="", oup="", tnp="", indsn="", Train_start_dt="", Trai
         t1['VAR_NAME'] = x
         t1.reset_index(inplace=True)
         t1.rename(columns={'index': 'LEVELS'}, inplace=True)
-        uni_freq1 = pd.concat([uni_freq1,t1],axis=0)
-        
+        uni_freq1 = pd.concat([uni_freq1, t1], axis=0)
+
     input_df_uni_freq = pd.merge(col_dtls[['VAR_NAME']], uni_freq1, how='inner', on='VAR_NAME')
 
     if input_df_uni_freq.VAR_NAME.nunique() == len(var_cat_list):
@@ -111,7 +119,11 @@ def univar_exec(src="",wrk="", oup="", tnp="", indsn="", Train_start_dt="", Trai
 
     # Univariate for numerical variables
     var_num_list = col_dtls[col_dtls.UNIVAR_TYPE.isin(['NUM'])].VAR_NAME
-    input_df_uni_perc = pd.DataFrame(columns=['VAR_NAME', 'N', 'NMISS', 'MISSING_PERCENT', 'MEAN', 'STD', 'MEDIAN', 'SUM', 'SKEWNESS', 'KURTOSIS','MIN', 'MAX', 'P-01', 'P-02', 'P-03', 'P-04', 'P-05', 'P-10', 'P-15', 'P-20', 'P-25', 'P-30', 'P-35','P-40', 'P-45', 'P-50', 'P-55', 'P-60', 'P-65', 'P-70', 'P-75', 'P-80', 'P-85', 'P-90', 'P-95', 'P-96','P-97', 'P-98', 'P-99', 'P-100'])
+    input_df_uni_perc = pd.DataFrame(
+        columns=['VAR_NAME', 'N', 'NMISS', 'MISSING_PERCENT', 'MEAN', 'STD', 'MEDIAN', 'SUM', 'SKEWNESS', 'KURTOSIS',
+                 'MIN', 'MAX', 'P-01', 'P-02', 'P-03', 'P-04', 'P-05', 'P-10', 'P-15', 'P-20', 'P-25', 'P-30', 'P-35',
+                 'P-40', 'P-45', 'P-50', 'P-55', 'P-60', 'P-65', 'P-70', 'P-75', 'P-80', 'P-85', 'P-90', 'P-95', 'P-96',
+                 'P-97', 'P-98', 'P-99', 'P-100'])
     for x in var_num_list:
         t1 = pd.DataFrame()
         t1.loc[0, 'VAR_NAME'] = x
@@ -154,7 +166,7 @@ def univar_exec(src="",wrk="", oup="", tnp="", indsn="", Train_start_dt="", Trai
         t1.loc[0, 'P-98'] = input_df_train[x].quantile(0.98)
         t1.loc[0, 'P-99'] = input_df_train[x].quantile(0.99)
         t1.loc[0, 'P-100'] = input_df_train[x].quantile(1)
-        input_df_uni_perc = pd.concat([input_df_uni_perc,t1],axis=0)
+        input_df_uni_perc = pd.concat([input_df_uni_perc, t1], axis=0)
 
     # Binning details based on maxmimum, l1, l2 , minimum missing percentage specified as an input
     input_df_uni_perc.loc[input_df_uni_perc['MISSING_PERCENT'] > maxmisslmt, 'BM_FLAG'] = 1
