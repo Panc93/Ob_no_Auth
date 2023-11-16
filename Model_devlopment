@@ -1,0 +1,48 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+
+def evaluate_classification_algorithms(X_train, y_train, X_test, y_test, algorithms):
+  """ Evaluates multiple classification algorithms and returns a dictionary of ROC AUC scores.
+
+  Args:
+    X_train: A NumPy array containing the training data.
+    y_train: A NumPy array containing the training labels.
+    X_test: A NumPy array containing the test data.
+    y_test: A NumPy array containing the test labels.
+    algorithms: A list of classification algorithms to evaluate.
+
+  Returns:
+    A dictionary of ROC AUC scores, with the algorithm names as keys.
+  """
+
+  roc_auc_scores = {}
+  for algorithm in algorithms:
+    model = algorithm()
+    model.fit(X_train, y_train)
+    y_pred_proba = model.predict_proba(X_test)[:, 1]
+    roc_auc_score = roc_auc_score(y_test, y_pred_proba)
+    roc_auc_scores[algorithm.__name__] = roc_auc_score
+
+  return roc_auc_scores
+if __name__ == __main__
+# Load the data.
+data = pd.read_csv('data.csv')
+
+# Split the data into training and test sets.
+X_train, X_test, y_train, y_test = train_test_split(data.drop('target', axis=1), data['target'], test_size=0.25)
+
+# Define the classification algorithms to evaluate.
+algorithms = [
+  LogisticRegression(),
+  RandomForestClassifier(),
+  XGBClassifier()
+]
+
+# Evaluate the classification algorithms and return the ROC AUC scores.
+roc_auc_scores = evaluate_classification_algorithms(X_train, y_train, X_test, y_test, algorithms)
+
+# Print the ROC AUC scores.
+for algorithm, roc_auc_score in roc_auc_scores.items():
+  print(f'{algorithm}: {roc_auc_score}')
