@@ -30,10 +30,7 @@ inner_cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
 
 # Define the hyperparameter grid
 
-param_grid =
-
-
-{
+param_grid ={
     'n_estimators': [ 200,300, 500],
     'learning_rate': [0.01, 0.05, 0.1],
     'lambda': [0.1, 0.5, 1]
