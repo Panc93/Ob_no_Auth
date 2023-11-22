@@ -98,13 +98,14 @@ def univar_exec(src="", wrk="", oup="", tnp="", indsn="", Train_start_dt="", Tra
     # Univariate for categorical variables
     var_cat_list = col_dtls[col_dtls.UNIVAR_TYPE.isin(['VARCHAR', 'CHAR - BINARY', 'CHAR - OTHER'])].VAR_NAME
     uni_freq1 = pd.DataFrame(columns=['LEVELS', 'FREQUENCY', 'PERCENT', 'VAR_NAME'])
+    x='accumulator_process'
     for x in var_cat_list:
         t1 = pd.DataFrame()
         t1['FREQUENCY'] = input_df_train[x].value_counts(dropna=False)
         t1['PERCENT'] = (t1['FREQUENCY'] / len(input_df_train)) * 100
         t1['VAR_NAME'] = x
         t1.reset_index(inplace=True)
-        t1.rename(columns={'index': 'LEVELS'}, inplace=True)
+        t1.rename(columns={x: 'LEVELS'}, inplace=True)
         uni_freq1 = pd.concat([uni_freq1, t1], axis=0)
 
     input_df_uni_freq = pd.merge(col_dtls[['VAR_NAME']], uni_freq1, how='inner', on='VAR_NAME')

@@ -162,8 +162,8 @@ def data_encoding_transform(src="" , oup="", wrk="", indsn="", timelwlmt="", tim
         # Save the one-hot encoded dataframe
         data_out.to_pickle(r"{}\{}_v2_hl.pkl".format(str(src), str(indsn[:10])))
         print("Input data has {} variables".format(str(input_df.shape)))
-        print("Input train data has {} variables".format(str(input_df_hl.shape)))
-        print("Output data has {} variables".format(str(data_out.shape)))
+        print("HL data has {} variables".format(str(input_df_hl.shape)))
+        print("Final HL data (encoded Output) has {} variables".format(str(data_out.shape)))
         print("Files saved")
         return True
     except :

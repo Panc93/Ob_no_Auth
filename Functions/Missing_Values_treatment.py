@@ -29,6 +29,7 @@ def missing_value_treatment(src="", indsn="", imputation_methods=" "):
     input_df.drop(columns_to_drop, axis=1, inplace=True)
     print(f"Dropping '{columns_to_drop}' as missing value is =100%")
     for col in missing_columns:
+        print(col)
         if col in imputation_methods:
             method = imputation_methods[col]
             if method == 'Mean':
@@ -39,9 +40,18 @@ def missing_value_treatment(src="", indsn="", imputation_methods=" "):
                 input_df[col].fillna(input_df[col].mode()[0], inplace=True)
             elif method == 'Zero':
                 input_df[col].fillna(0, inplace=True)
-            elif method == 'custom':
-                # Iterate through each procedure code
-                pass
+            elif method == 'outlier':
+                print('outlier')
+                #Calculate the 5th percentile value
+                percentile_value_lower = input_df[col].quantile(0.05)
+
+                # Calculate the 95th percentile value
+                percentile_value_upper = input_df[col].quantile(0.95)
+                # Cap values lower than the 5th percentile
+                input_df[col] = input_df[col].clip(lower=percentile_value_lower)
+                # Cap values greater than the 95th percentile
+                input_df[col] = input_df[col].clip(upper=percentile_value_upper)
+
             else:
                 print(f"Invalid imputation method specified for column '{col}'. Skipping imputation.")
         else:

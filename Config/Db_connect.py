@@ -10,12 +10,7 @@ import snowflake.connector
 
 # Read configuration from config.ini
 config = configparser.ConfigParser()
-config.read('config.ini')
-
-# Read configuration from config.ini
-config = configparser.ConfigParser()
-config.read('config.ini')
-
+config.read(r'C:\Users\ParnikaPancholi\PycharmProjects\Ob_no_Auth\Config\config.ini')
 
 def sqlconnection():
     # Get credentials from the configuration
